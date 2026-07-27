@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TỒN KHO | JPK VÕ</title>
+  <meta name="description" content="Trang tra cứu và xuất báo cáo tồn kho sản phẩm JPK Võ" />
+  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="inventory-export.css?v=23" />
+</head>
+<body class="inventory-page">
+  <div class="page-glow page-glow--gold"></div>
+  <div class="page-glow page-glow--red"></div>
+  <div class="lux-bubble lux-bubble--one"></div>
+  <div class="lux-bubble lux-bubble--two"></div>
+  <div class="lux-bubble lux-bubble--three"></div>
+
+  <header class="hero inventory-hero" id="pageTop">
+    <div class="hero-card inventory-hero-card">
+      <div class="inventory-hero-heading">
+        <p class="inventory-company-line">JPK VÕ · BRAVAT</p>
+        <h1>TỒN KHO KHẢ DỤNG</h1>
+      </div>
+
+      <div class="inventory-brand-lockup" aria-label="Thương hiệu JPK Võ và Bravat">
+        <div class="inventory-brand-cell inventory-brand-cell--jpkvo">
+          <img src="jpkvo.png" alt="JPK VÕ" />
+        </div>
+        <span class="inventory-brand-divider" aria-hidden="true"></span>
+        <div class="inventory-brand-cell inventory-brand-cell--bravat">
+          <img src="bravat.png" alt="BRAVAT" onerror="this.hidden=true;this.nextElementSibling.hidden=false" />
+          <span class="inventory-logo-fallback" hidden>BRAVAT</span>
+        </div>
+      </div>
+
+      <div class="inventory-update-line">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span>Cập nhật dữ liệu: <strong id="updatedAt">—</strong></span>
+      </div>
+      <p class="inventory-vat-note">Giá niêm yết chưa gồm VAT 8%</p>
+    </div>
+  </header>
+
+  <main class="shell inventory-shell">
+
+    <section class="inventory-panel" aria-label="Danh sách tồn kho">
+      <div class="inventory-content">
+        <div class="inventory-toolbar" id="inventoryToolbar">
+          <div class="toolbar-main-row">
+            <button class="group-drawer-toggle" id="groupDrawerToggle" type="button" aria-expanded="false" aria-controls="groupDrawer">
+              <span class="toggle-bars" aria-hidden="true"></span>
+              NHÓM HÀNG
+            </button>
+
+            <label class="inventory-search">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="visually-hidden">Tìm sản phẩm</span>
+              <input id="inventorySearch" type="search" placeholder="Tìm mã, tên hoặc thông số..." autocomplete="off" />
+              <kbd>Ctrl K</kbd>
+            </label>
+
+            <button class="reset-filter-btn" id="resetFilters" type="button">XÓA LỌC</button>
+
+            <button class="inventory-export-open" id="openExportDialog" type="button">
+              <span aria-hidden="true">⇩</span> XUẤT DỮ LIỆU
+            </button>
+          </div>
+
+          <div class="toolbar-filter-row">
+            <label class="filter-group-control">
+              <span>NHÓM HÀNG</span>
+              <select id="mobileGroupSelect"></select>
+            </label>
+
+            <label class="filter-subgroup-control">
+              <span>NHÓM CON</span>
+              <select id="subgroupSelect">
+                <option value="ALL">Tất cả nhóm con</option>
+              </select>
+            </label>
+
+            <label class="filter-stock-control">
+              <span>SỐ LƯỢNG</span>
+              <select id="stockFilter">
+                <option value="all">Tất cả mức tồn</option>
+                <option value="out">Hết hàng</option>
+                <option value="low">Còn 1–3</option>
+                <option value="medium">Còn 4–10</option>
+                <option value="high">Trên 10</option>
+              </select>
+            </label>
+
+            <label>
+              <span>SẮP XẾP</span>
+              <select id="sortSelect">
+                <option value="recommended">Ưu tiên bán hàng</option>
+                <option value="code-asc">Mã A–Z</option>
+                <option value="code-desc">Mã Z–A</option>
+                <option value="quantity-asc">Số lượng ít–nhiều</option>
+                <option value="quantity-desc">Số lượng nhiều–ít</option>
+                <option value="price-asc">Giá thấp–cao</option>
+                <option value="price-desc">Giá cao–thấp</option>
+              </select>
+            </label>
+
+            <label class="page-size-lock">
+              <span>HIỂN THỊ</span>
+              <select id="pageSizeSelect">
+                <option value="10" selected>10 mã/trang</option>
+                <option value="25">25 mã/trang</option>
+                <option value="50">50 mã/trang</option>
+                <option value="100">100 mã/trang</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="inventory-result-bar">
+          <div>
+            <p id="resultTitle">TẤT CẢ SẢN PHẨM</p>
+            <span id="resultCount">Đang tải dữ liệu...</span>
+          </div>
+          <div class="inventory-result-actions">
+            <div class="selection-compact">
+              <button id="selectAllFilteredBtn" type="button">CHỌN TẤT CẢ</button>
+              <span id="selectedCompact" hidden>ĐÃ CHỌN <strong id="selectedCount">0</strong></span>
+              <button id="clearSelection" class="selection-clear" type="button" aria-label="Bỏ chọn" hidden>×</button>
+            </div>
+            <div class="stock-legend" aria-label="Chú thích số lượng">
+              <span><i class="legend-dot legend-dot--out"></i>0</span>
+              <span><i class="legend-dot legend-dot--low"></i>1–3</span>
+              <span><i class="legend-dot legend-dot--medium"></i>4–10</span>
+              <span><i class="legend-dot legend-dot--high"></i>&gt;10</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inventory-table-wrap" id="tableWrap">
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th class="col-stt">STT</th>
+                <th class="col-group">NHÓM</th>
+                <th class="col-subgroup">NHÓM PHỤ</th>
+                <th class="col-code">MÃ SẢN PHẨM</th>
+                <th class="col-name">TÊN SẢN PHẨM</th>
+                <th class="col-price">GIÁ NIÊM YẾT</th>
+                <th class="col-quantity">TỒN</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="inventory-mobile-list" id="inventoryMobileList"></div>
+
+        <div class="inventory-empty" id="inventoryEmpty" hidden>
+          <strong>KHÔNG TÌM THẤY SẢN PHẨM</strong>
+          <span>Hãy đổi nhóm hàng, mức tồn hoặc từ khóa tìm kiếm.</span>
+        </div>
+
+        <div class="inventory-pagination" id="pagination">
+          <button id="prevPage" type="button" aria-label="Trang trước">← TRƯỚC</button>
+          <div id="pageNumbers" class="page-numbers"></div>
+          <button id="nextPage" type="button" aria-label="Trang sau">SAU →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer footer--contact inventory-footer" id="pageBottom">
+    <div class="footer-main" data-align="left">
+      <strong class="footer-company">CTY TNHH JPK VÕ</strong>
+      <div class="footer-contact">
+        <p class="footer-address-title">Địa chỉ:</p>
+        <p>Showroom Đà Nẵng: 382 Nguyễn Tri Phương, P. Hòa Cường, TP. Đà Nẵng</p>
+        <p>Showroom Huế: 66 Phạm Văn Đồng, P. Vỹ Dạ, TP. Huế</p>
+        <p>Hotline: <a href="tel:0946122822">0946 122822</a></p>
+        <p>Email: <a href="mailto:info@jpkvo.com">info@jpkvo.com</a></p>
+        <p>Website: <a href="https://jpkvo.com" target="_blank" rel="noopener">jpkvo.com</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="group-drawer-backdrop" id="groupDrawerBackdrop" type="button" aria-label="Đóng danh mục" hidden></button>
+  <aside class="group-drawer" id="groupDrawer" aria-label="Lọc theo nhóm hàng" hidden>
+    <div class="group-drawer-header">
+      <div>
+        <p>NHÓM HÀNG</p>
+        <span id="groupSummary">0 nhóm</span>
+      </div>
+      <button class="group-drawer-close" id="groupDrawerClose" type="button" aria-label="Đóng">×</button>
+    </div>
+    <div class="group-list" id="groupList"></div>
+  </aside>
+
+  <button class="floating-preview-backdrop" id="floatingPreviewBackdrop" type="button" aria-label="Đóng cửa sổ xem nhanh" hidden></button>
+
+  <div class="image-preview" id="imagePreview" role="dialog" aria-label="Xem nhanh ảnh sản phẩm" hidden>
+    <button class="floating-panel-close" id="imagePreviewClose" type="button" aria-label="Đóng bảng ảnh" title="Đóng">×</button>
+    <button class="preview-image-frame" id="previewImageButton" type="button" aria-label="Mở ảnh lớn">
+      <img id="previewImage" alt="" />
+      <span class="image-zoom-hint" id="imageZoomHint" hidden>CHẠM ĐỂ MỞ ẢNH LỚN</span>
+      <span class="image-placeholder" id="previewPlaceholder">
+        <span>CHƯA CÓ ẢNH</span>
+        <small>Mã đã được giữ lại nhưng chưa có đường dẫn ảnh.</small>
+      </span>
+      <span class="image-loader" id="previewLoader" hidden></span>
+    </button>
+    <div class="preview-copy">
+      <span id="previewGroup">—</span>
+      <strong id="previewCode">—</strong>
+      <p id="previewName">—</p>
+      <div class="preview-actions" id="previewActions">
+        <button id="openTechnicalDrawing" type="button" hidden>BẢN VẼ KỸ THUẬT</button>
+        <button id="copyPreviewCode" type="button">SAO CHÉP MÃ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-preview" id="specPreview" role="dialog" aria-label="Thông số kỹ thuật" hidden>
+    <button class="floating-panel-close" id="specPreviewClose" type="button" aria-label="Đóng bảng thông số" title="Đóng">×</button>
+    <div class="spec-preview-head">
+      <span id="specGroup">—</span>
+      <strong id="specCode">—</strong>
+      <p id="specName">—</p>
+    </div>
+    <div class="spec-preview-grid" id="specPreviewGrid"></div>
+  </div>
+
+  <div class="image-modal" id="imageModal" hidden>
+    <button class="modal-backdrop" id="modalBackdrop" type="button" aria-label="Đóng ảnh"></button>
+    <div class="image-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalProductCode">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Đóng">×</button>
+      <div class="modal-image-frame">
+        <img id="modalImage" alt="" />
+      </div>
+      <div class="modal-copy">
+        <span id="modalProductGroup">—</span>
+        <strong id="modalProductCode">—</strong>
+        <p id="modalProductName">—</p>
+        <a id="openOriginalImage" href="#" target="_blank" rel="noopener">MỞ ẢNH GỐC ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-modal" id="exportModal" hidden>
+    <button class="export-modal-backdrop" id="exportModalBackdrop" type="button" aria-label="Đóng cửa sổ xuất file"></button>
+    <section class="export-dialog" role="dialog" aria-modal="true" aria-labelledby="exportDialogTitle">
+      <button class="export-dialog-close" id="exportDialogClose" type="button" aria-label="Đóng">×</button>
+      <div class="export-dialog-head">
+        <span>JPK VÕ · BRAVAT</span>
+        <h2 id="exportDialogTitle">XUẤT KẾT QUẢ ĐANG LỌC</h2>
+        <p id="exportScopeText">—</p>
+      </div>
+
+      <div class="export-selection-tabs">
+        <label>
+          <input type="radio" name="exportSelectionMode" value="filtered" checked />
+          <span>TẤT CẢ KẾT QUẢ</span>
+        </label>
+        <label>
+          <input type="radio" name="exportSelectionMode" value="selected" />
+          <span id="exportSelectedModeText">MÃ ĐÃ CHỌN</span>
+        </label>
+      </div>
+
+      <div class="export-format-grid" id="exportFormatGrid">
+        <button type="button" data-export-format="pdf">
+          <b>PDF</b><span>Báo cáo trình bày theo trang, đầy đủ ảnh và thông số.</span>
+        </button>
+        <button type="button" data-export-format="xlsx">
+          <b>EXCEL</b><span>Tệp .xlsx có ảnh nằm trong từng dòng sản phẩm.</span>
+        </button>
+        <button type="button" data-export-format="docx">
+          <b>WORD</b><span>Tệp .docx dạng catalogue, dễ chỉnh sửa và in.</span>
+        </button>
+        <button type="button" data-export-format="png">
+          <b>PNG</b><span>Xuất từng trang ảnh rõ nét vào thư mục do bạn chọn.</span>
+        </button>
+      </div>
+
+      <div class="export-progress" id="exportProgress" hidden>
+        <div class="export-progress-line">
+          <strong id="exportProgressTitle">ĐANG CHUẨN BỊ</strong>
+          <span id="exportProgressPercent">0%</span>
+        </div>
+        <div class="export-progress-track"><i id="exportProgressBar"></i></div>
+        <p id="exportProgressDetail">Đang chuẩn bị dữ liệu...</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="export-toast" id="exportToast" role="status" aria-live="polite" hidden></div>
+  <button class="inventory-back-top" id="inventoryBackTop" type="button" aria-label="Lên đầu trang">↑</button>
+
+  <noscript>Trang tồn kho cần JavaScript để tìm kiếm, lọc và xuất dữ liệu.</noscript>
+  <script src="inventory-data.js?v=23"></script>
+  <script src="inventory-images.js?v=23"></script>
+  <script src="inventory-assets.js?v=23"></script>
+  <script src="spec-manifest.js?v=23"></script>
+  <script src="inventory-v23.js?v=23"></script>
+  <script src="inventory-export-v21.js?v=23"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+.site-nav-wrap {
+  max-width: 1240px;
+  margin: 18px auto 0;
+  padding: 0 clamp(16px, 3vw, 36px);
+  position: relative;
+  z-index: 30;
+}
+
+.site-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,.92);
+  border-radius: 999px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 14px 42px rgba(72,42,0,.10);
+  backdrop-filter: blur(20px);
+}
+
+.site-nav a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 999px;
+  color: #5f4a2a;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  transition: transform .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.site-nav a:hover {
+  color: #0f0f10;
+  background: rgba(255,226,122,.34);
+  transform: translateY(-1px);
+}
+
+.site-nav a[aria-current="page"] {
+  color: #fff;
+  background: linear-gradient(135deg, #111 0%, #6e4205 100%);
+  box-shadow: 0 10px 24px rgba(60,37,0,.22);
+}
+
+.logo-wordmark-fallback {
+  display: none;
+  color: #111;
+  font-size: clamp(17px, 2vw, 24px);
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.logo-wordmark-fallback.is-visible { display: block; }
+
+@media (max-width: 560px) {
+  .site-nav-wrap { margin-top: 12px; }
+  .site-nav { width: 100%; }
+  .site-nav a { flex: 1; min-height: 38px; padding: 0 10px; font-size: 11px; }
+}
